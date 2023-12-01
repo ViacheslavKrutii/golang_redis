@@ -1,29 +1,30 @@
 package main
 
 import (
-	"golang_mvc_REST_API/controllers"
-	"golang_mvc_REST_API/db"
-	"golang_mvc_REST_API/models"
-	"net/http"
-
-	"github.com/gorilla/mux"
+	"Proj/golang_pub-sub_observe/objects"
+	"Proj/golang_pub-sub_observe/state"
 )
 
+func observerExample() {
+	state := state.NewState()
+	bob := objects.CreatePlayer("Bob", state)
+	alice := objects.CreatePlayer("Alice", state)
+	ignat := objects.CreatePlayer("Ignat", state)
+
+	bob.CreateLobby()
+	ignat.CreateLobby()
+	bob.InvitePlayer(alice)
+	ignat.InvitePlayer(alice)
+	alice.CheckInvites()
+	bob.Move()
+	bob.Move()
+	bob.Move()
+	bob.Move()
+	bob.Move()
+
+}
+
 func main() {
+	observerExample()
 
-	menu1 := &models.Menu{MenuItems: []models.MenuItem{{Name: "Борщ", Price: 10}}}
-	datastore := db.NewInMemoryState()
-
-	orderController := controllers.NewOrderController(datastore)
-	menuController := controllers.MenuController{}
-	menuController.AddMenu(menu1)
-
-	r := mux.NewRouter()
-
-	r.HandleFunc("/menu", menuController.ShowMenuController).Methods("GET")
-	r.HandleFunc("/order/make", orderController.MakeOrderController).Methods("POST")
-	r.HandleFunc("/order/delete", orderController.DeleteOrderController).Methods("POST")
-	r.HandleFunc("/order/example", controllers.Example).Methods("GET")
-
-	http.ListenAndServe("localhost:8080", r)
 }
