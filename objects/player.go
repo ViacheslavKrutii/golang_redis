@@ -10,11 +10,11 @@ import (
 )
 
 type player struct {
-	name          string
-	lobby         *lobby
-	invites       []invite
-	role          role
-	inviteHistory *state.StateStruct
+	name    string
+	lobby   *lobby
+	invites []invite
+	role    role
+	state   *state.StateStruct
 }
 
 type role interface {
@@ -32,7 +32,7 @@ type spectator struct {
 func (s spectator) role() {}
 
 func CreatePlayer(name string, state *state.StateStruct) *player {
-	return &player{name: name, lobby: nil, role: nil, inviteHistory: state}
+	return &player{name: name, lobby: nil, role: nil, state: state}
 }
 
 func (p *player) CreateLobby() (newLobby *lobby, err error) {
@@ -55,7 +55,7 @@ func (p *player) InvitePlayer(p2 *player) {
 	}
 	newInvite := invite{adress: p.lobby, whoInvite: p, whoInvited: p2}
 	p2.invites = append(p2.invites, newInvite)
-	p.inviteHistory.Db.WriteHistory(p.name, p2.name)
+	p.state.WriteHistory(p.name, p2.name)
 
 }
 
@@ -89,4 +89,7 @@ func (p *player) Move() {
 
 func (p *player) Observe(subject any) {
 	fmt.Printf("%s received a notification %v\n", p.name, subject)
+}
+func (p *player) ShowInviteHistory() {
+	p.state.ShowInviteHistory(p.name)
 }
